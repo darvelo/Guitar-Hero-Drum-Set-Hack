@@ -4,18 +4,13 @@
 #include <avr/interrupt.h>  /* for sei() */
 #include <util/delay.h>     /* for _delay_ms() */
 
-//#include <avr/boot.h>
-//#include <avr/eeprom.h>
-#include <inttypes.h>
-#include <avr/pgmspace.h> 
 
 #define F_CPU 1000000
 
 #define PedalPressed			bit_is_set(PINB, PB1)
-//bool waitForSwitchClear = false;
 
 
-
+// Barebones intterupt test failed.. commented out in favor of polling method.
 /*ISR(TIMER1_CAPT_vect) {
 
 	PORTB ^= (1<<PB2);
@@ -24,25 +19,26 @@
 
 int main (void) {
 
-	DDRB = 0x06;
+	DDRB = 0x04;   // Port B pin 2 is output, pin 1 is input
 //	TIMSK1 = ((1<<ICIE1) );  // enable input capture interrupt
 //	TCCR1B = (  (1<<ICNC1) | (1<<ICES1) );  // input capture noise canceling, edge select: rising edge
-	sei();
+//	sei();   // enable global interrupts
+
 	while (1){
 	
-	//	if (TIFR1 & (1<<ICF1)){
-	//		TIFR1 |= (1<<ICF1);
 		if (PedalPressed) {
 
-		 	PORTB |= (1<<PB2);
-			_delay_ms(40);
-			PORTB &= ~(1<<PB2);
-			while (PedalPressed);
+		 	PORTB |= (1<<PB2);    // signal turn on
+			_delay_ms(40);        // wait 40ms
+			PORTB &= ~(1<<PB2);   // signal turn off
+			while (PedalPressed);  // wait until pedal is released
 		}
 	}
 
 }
 
+
+// Initial method of using interrupts.  Abandoned due to unknown 4-second block until input capture trigger.
 
 /*ISR(TIMER1_CAPT_vect)
 {
